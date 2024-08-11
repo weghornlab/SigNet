@@ -44,7 +44,7 @@ def plot(x, y, z):
 
 if __name__ == "__main__":
     data_dir = os.path.join(DATA, "datasets", "vae_classification_test")
-    model_dir = os.path.join(TRAINED_MODELS, "vae_classifier/classifier_1")
+    model_dir = os.path.join(TRAINED_MODELS, "vae_classifier/classifier_3")
     
     data = parse_data(data_dir)
     
@@ -86,22 +86,22 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     x = [e for e in downstream]
     y = torch.tensor([metrics[f"downstream_{e}"]["rec_dist"] for e in downstream])
-    z = torch.tensor([metrics[f"downstream_{e}"]["z_mu"] for e in downstream])
+    # z = torch.tensor([metrics[f"downstream_{e}"]["z_mu"] for e in downstream])
 
     #normalize
     y = (y - y.mean()) / y.std()
-    z = (z - z.mean()) / z.std()
+    # z = (z - z.mean()) / z.std()
 
     # same for upstream, yes I'm being very lazy here
     xx = [e for e in upstream]
     yy = torch.tensor([metrics[f"upstream_{e}"]["rec_dist"] for e in upstream])
-    zz = torch.tensor([metrics[f"upstream_{e}"]["z_mu"] for e in upstream])
+    # zz = torch.tensor([metrics[f"upstream_{e}"]["z_mu"] for e in upstream])
     
     yy = (yy - yy.mean()) / yy.std()
-    zz = (zz - zz.mean()) / zz.std()
+    # zz = (zz - zz.mean()) / zz.std()
 
-    plt.plot(x, 0.6*y + 0.4*z, label="Downstream Dissimilarity")
-    plt.plot(xx, 0.6*yy + 0.4*zz, label="Upstream Dissimilarity")
+    plt.plot(x, y, label="Downstream Dissimilarity")
+    plt.plot(xx, yy, label="Upstream Dissimilarity")
     plt.legend()
     plt.show()
 

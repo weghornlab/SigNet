@@ -31,7 +31,7 @@ class VaeClassifierTrainer:
             lagrange_param=1.0,
             loging_path="../runs",
             num_classes=94,
-            log_freq=100,
+            log_freq=1000,
             model_path=None,  # File where to save model learned weights None to not save
             device=torch.device("cuda:0"),
         ):
@@ -51,11 +51,12 @@ class VaeClassifierTrainer:
             device=device)
 
 
-    def __loss(self, input, pred, z_mu, z_std):
-        kl_div = (0.5*(z_std.pow(2) + z_mu.pow(2) - 2*torch.log(z_std) - 1).sum(dim=1)).mean(dim=0)
-        reconstruction = nn.MSELoss()(input, pred)
+    def __loss(self, ins, pred, z_mu, z_std):
+        # kl_div = (0.5*(z_std.pow(2) + z_mu.pow(2) - 2*torch.log(z_std) - 1).sum(dim=1)).mean(dim=0)
+        reconstruction = nn.MSELoss()(ins, pred)
         # reconstruction = get_jensen_shannon(predicted_label=pred, true_label=input)
-        return reconstruction + self.adapted_lagrange_param*kl_div
+        # return reconstruction + self.adapted_lagrange_param*kl_div
+        return reconstruction
 
     def objective(self,
                   batch_size,
@@ -80,6 +81,7 @@ class VaeClassifierTrainer:
             device=self.device.type
         )
         model.to(self.device)
+        model.train()
 
         # wandb.watch(model, log_freq=100)
 
@@ -100,18 +102,17 @@ class VaeClassifierTrainer:
         for iteration in range(self.iterations):
             for train_input, train_labels, _, _, _ in tqdm(dataloader):
                 train_input = train_input[(train_labels == 1).squeeze(-1)]
-                model.train()
                 optimizer.zero_grad()
-                train_pred, train_mean, train_std = model(train_input)
+                train_pred, train_mean, train_std = model(train_input, noise=False)
                 # self.adapted_lagrange_param = self.lagrange_param
-                if step < total_steps*0.8:
-                    self.adapted_lagrange_param = self.lagrange_param * \
-                        float(total_steps - step)/float(total_steps)
-                else:
-                    self.adapted_lagrange_param = self.lagrange_param * \
-                        float(total_steps - total_steps*0.8)/float(total_steps)
+                # if step < total_steps*0.8:
+                #     self.adapted_lagrange_param = self.lagrange_param * \
+                #         float(total_steps - step)/float(total_steps)
+                # else:
+                #     self.adapted_lagrange_param = self.lagrange_param * \
+                #         float(total_steps - total_steps*0.8)/float(total_steps)
                 train_loss = self.__loss(
-                    input=train_input,
+                    ins=train_input,
                     pred=train_pred,
                     z_mu=train_mean,
                     z_std=train_std,
@@ -120,19 +121,28 @@ class VaeClassifierTrainer:
                 train_loss.backward()
                 optimizer.step()
 
-                model.eval()
-                with torch.no_grad():
-                    val_inputs = self.val_dataset.inputs[(self.val_dataset.labels == 1).squeeze(-1)]
-                    val_pred, val_mean, val_std = model(
-                        val_inputs)
-                    val_loss = self.__loss(input=val_inputs,
-                                           pred=val_pred,
-                                           z_mu=val_mean,
-                                           z_std=val_std)
+                
                     # l_vals.append(val_loss.item())
                     # max_found = max(max_found, -np.nanmean(l_vals))
 
-                if plot and step % self.log_freq == 0:
+                if plot and step % self.log_freq == 0 and step > 0:
+                    print("Validating...")
+                    model.eval()
+                    with torch.no_grad():
+                        val_inputs = self.val_dataset.inputs[(self.val_dataset.labels == 1).squeeze(-1)][:100]
+                        val_pred, val_mean, val_std = model(
+                            val_inputs, noise=False
+                        )
+                        val_loss = self.__loss(
+                            ins=val_inputs,
+                            pred=val_pred,
+                            z_mu=val_mean,
+                            z_std=val_std
+                        )
+                    print("Validating [DONE]")
+
+                    print("Logging...")
+                    
                     current_train_DQ99R = self.logger.log(
                         train_loss=train_loss,
                         train_prediction=train_pred,
@@ -147,10 +157,16 @@ class VaeClassifierTrainer:
                         step=step,
                         model=model,
                     )
+                    # TODO: Add posterior collapse metric
+                    
                     train_DQ99R = current_train_DQ99R if current_train_DQ99R is not None else train_DQ99R
+                    model.train()
+                    print("Logging [DONE]")
 
                 if self.model_path is not None and step % 500 == 0:
+                    print("Saving model...")
                     save_model(model=model, directory=self.model_path)
+                    print("Saving model [DONE]")
                 step += 1
         if self.model_path is not None:
             save_model(model=model, directory=self.model_path)

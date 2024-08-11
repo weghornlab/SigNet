@@ -1,7 +1,7 @@
 config:
     # IDs & paths
     data_id: "datasets/detector"
-    model_id: "classifier_2"
+    model_id: "classifier_3"
     models_dir: "vae_classifier/"
 
     # Training params
