@@ -1,0 +1,22 @@
+config:
+    # IDs & paths
+    data_id: "datasets/detector"
+    model_id: "ocsmv_classifier"
+    models_dir: "ocsmv_classifier/"
+
+    # Training params
+    iterations: 10000
+    num_classes: 96
+    lagrange_param: 0.01
+    lr: 0.001
+
+    # WANDB params
+    enable_logging: True
+    wandb_project_id: "ocsvm_classification"
+
+    # Network params (not used)
+    num_hidden_layers: 1
+    latent_dim: 14
+
+    # Misc
+    device: "cuda"
