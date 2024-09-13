@@ -1,11 +1,11 @@
 config:
     # IDs & paths
     data_id: "datasets/detector"
-    model_id: "initializations_test"
+    model_id: "ae_best_2_3"
     models_dir: "vae_classifier/"
 
     # Training params
-    iterations: 2000
+    iterations: 10000
     num_classes: 96
     lagrange_param: 0.01
     batch_size: 115
@@ -15,11 +15,13 @@ config:
 
     # WANDB params
     enable_logging: True
-    wandb_project_id: "vae_classification_initialization"
+    wandb_project_id: "vae_classification"
 
     # Network params
     num_hidden_layers: 1
     latent_dim: 14
+    num_units: 271
+    num_units_branch_mut: 1
 
     # Misc
     device: "cuda"

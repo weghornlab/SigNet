@@ -1054,6 +1054,27 @@ def plot_histograms(data_dict, bins=100):
     plt.legend()
     plt.show()
 
+def plot_matrix(matrix, filename=None, title=None, show=False, ids_x=None, ids_y=None):
+    if isinstance(matrix, torch.Tensor):
+        matrix = matrix.detach().cpu().numpy()
+    fig, ax = plt.subplots()
+    ax.imshow(matrix)
+    if title is not None:
+        ax.set_title(title)
+    if ids_x is not None:
+        plt.xticks(rotation=90)
+        ax.set_xticks(np.arange(len(ids_x)))
+        ax.set_yticks(np.arange(len(ids_y)))
+
+        ax.xaxis.set_ticklabels(ids_x)
+        ax.yaxis.set_ticklabels(ids_y)
+    fig.tight_layout()
+    if filename is not None:
+        fig.savefig(filename + ".png")
+    if show:
+        fig.show()
+    return fig
+
 if __name__ == "__main__":
     deconstructSigs_labels = [0.1, 0.7, 0.2]
     real_labels = [0.2, 0.5, 0.3]

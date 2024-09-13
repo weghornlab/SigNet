@@ -145,7 +145,7 @@ signatures-nets.e*
 results/
 plots/*
 runs_old/
-!signaturesnet/trained_models
+signaturesnet/trained_models
 !signaturesnet/data
 
 !.vscode/launch.json

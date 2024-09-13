@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from torchmetrics import Accuracy
+# from torchmetrics import Accuracy
 from tqdm import tqdm
 from signaturesnet.utilities.plotting import plot_confusion_matrix
 import wandb
