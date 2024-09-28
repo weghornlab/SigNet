@@ -272,6 +272,36 @@ def get_distances_metrics(distances, quantiles=[0.99]):
     metrics["quantiles"] = np.round(quantiles.detach().cpu().numpy(), 3)
     return metrics
 
+def binary_classification_metrics(predictions, labels):
+    # Ensure predictions and labels are binary (0 or 1)
+    predictions = predictions.int()
+    labels = labels.int()
+    
+    # True Positives (TP), False Positives (FP), True Negatives (TN), False Negatives (FN)
+    TP = ((predictions == 1) & (labels == 1)).sum().item()
+    FP = ((predictions == 1) & (labels == 0)).sum().item()
+    TN = ((predictions == 0) & (labels == 0)).sum().item()
+    FN = ((predictions == 0) & (labels == 1)).sum().item()
+
+    # Calculate metrics
+    accuracy = (TP + TN) / (TP + TN + FP + FN)
+    precision = TP / (TP + FP) if (TP + FP) > 0 else 0
+    recall = TP / (TP + FN) if (TP + FN) > 0 else 0
+    f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+
+    # Confusion matrix
+    confusion_matrix = torch.tensor([[TN, FP],
+                                     [FN, TP]])
+
+    # Return results as a dictionary
+    return {
+        'accuracy': round(accuracy, 2),
+        'precision': round(precision, 2),
+        'recall': round(recall, 2),
+        'f1_score': round(f1_score, 2),
+        'confusion_matrix': confusion_matrix,
+    }
+
 METRICS_DICT = {
     "mse" : get_MSE,
     "cos" : get_negative_cosine_similarity,

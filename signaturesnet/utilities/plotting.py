@@ -4,7 +4,11 @@ import matplotlib.cm as cm
 import numpy as np
 import pandas as pd
 import seaborn as sn
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import (
+    confusion_matrix,
+    roc_curve,
+    roc_auc_score
+)
 import torch
 
 
@@ -1074,6 +1078,55 @@ def plot_matrix(matrix, filename=None, title=None, show=False, ids_x=None, ids_y
     if show:
         fig.show()
     return fig
+
+
+def plot_histogram(data_vector, bins=100, title='Histogram', xlabel='Value', ylabel='Frequency'):
+    plt.hist(data_vector, bins=bins, edgecolor='black')
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.grid(True)
+    plt.show()
+
+
+def plot_roc(labels, guesses, name=""):
+    # ROC AUC:
+    fpr, tpr, thresh = roc_curve(labels.detach().numpy(), guesses.detach().numpy(), pos_label=1)
+    # print("fpr:", fpr)
+    # print("tpr:", tpr)
+    # print("thresh:", thresh)
+    auc_score = roc_auc_score(labels.detach().numpy(), guesses.detach().numpy())
+
+    # plot roc curves
+    plt.plot(fpr, tpr, linestyle='--', label=f'{name} (area = %0.2f)' % auc_score)
+    plt.title('ROC curve')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive rate')
+    plt.legend(loc='best')
+    plt.show()
+
+
+
+def plot_box(labels, values):
+    # Convert tensors to numpy arrays
+    labels_np = labels.cpu().numpy()
+    values_np = values.cpu().numpy()
+    
+    # Separate values based on labels
+    values_class_0 = values_np[labels_np == 0]
+    values_class_1 = values_np[labels_np == 1]
+    
+    # Prepare data for the box plot
+    data = [values_class_0, values_class_1]
+    
+    # Create box plot
+    plt.figure(figsize=(8, 6))
+    plt.boxplot(data, labels=['Class 0', 'Class 1'])
+    plt.title('Box Plot of Values by Class')
+    plt.ylabel('Values')
+    # plt.ylim(-0, 10.0)
+    plt.show()
+
 
 if __name__ == "__main__":
     deconstructSigs_labels = [0.1, 0.7, 0.2]
