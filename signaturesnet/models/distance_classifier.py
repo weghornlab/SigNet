@@ -22,18 +22,18 @@ class DistanceBasedClassifier(torch.nn.Module):
     def _classify(self, dists, num_mut):
         # These were found empirically through a validation set
         thresholds = {
-            2: -0.15523124,
-            3: 0.17029715,
-            4: 0.4533264,
-            5: 0.62407064,
-            6: 0.69505817,
-            7: 0.72085524,
-            8: 0.7727176,
-            9: 0.79976183,
-            10: 0.8204671,
-            11: 0.72816014
+            2: -0.23375274240970612,
+            3: 0.09172570705413818,
+            4: 0.4452713131904602,
+            5: 0.6428919434547424,
+            6: 0.7619860172271729,
+            7: 0.8058968186378479,
+            8: 0.8330588936805725,
+            9: 0.8443573117256165,
+            10: 0.8582318425178528,
+            11: 0.8613357543945312
         }
-        default_threshold = 0.84
+        default_threshold = 0.82
         n_mut_class = torch.log(num_mut).to(torch.int)
         
         logits = 1 - dists

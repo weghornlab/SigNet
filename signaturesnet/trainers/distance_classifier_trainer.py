@@ -19,18 +19,25 @@ from signaturesnet.utilities.plotting import (
 from signaturesnet.utilities.metrics import binary_classification_metrics
 
 
+# def find_threshold(labels, guesses):
+#     fpr, tpr, thresh = roc_curve(labels.detach().numpy(), guesses.detach().numpy(), pos_label=1)
+#     best_threshold = 0
+#     best_f1 = 0
+#     for i in range(len(fpr)):
+#         precision = tpr[i] / (tpr[i] + fpr[i]) if (tpr[i] + fpr[i]) > 0 else 0
+#         recall = tpr[i]
+#         f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+#         if f1 > best_f1:
+#             best_f1 = f1
+#             best_threshold = thresh[i]
+#     return best_threshold, best_f1
+
 def find_threshold(labels, guesses):
-    fpr, tpr, thresh = roc_curve(labels.detach().numpy(), guesses.detach().numpy(), pos_label=1)
-    best_threshold = 0
-    best_f1 = 0
-    for i in range(len(fpr)):
-        precision = tpr[i] / (tpr[i] + fpr[i]) if (tpr[i] + fpr[i]) > 0 else 0
-        recall = tpr[i]
-        f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-        if f1 > best_f1:
-            best_f1 = f1
-            best_threshold = thresh[i]
-    return best_threshold, best_f1
+    real_guesses = guesses[labels == 1]
+    
+    thresh = torch.quantile(real_guesses, 0.05, interpolation='linear')
+    
+    return thresh, None
 
 
 if __name__ == "__main__":
@@ -64,11 +71,11 @@ if __name__ == "__main__":
         c_logits = classifier_logits[c_pos].flatten()
         
         # plot_box(labels=c_labels, values=c_logits)
-        plot_roc(labels=c_labels.cpu(), guesses=c_logits.cpu(), name="n~=" + str(int(torch.exp(c).item())))
+        # plot_roc(labels=c_labels.cpu(), guesses=c_logits.cpu(), name="n~=" + str(int(torch.exp(c).item())))
 
         thresh, f1 = find_threshold(labels=c_labels.cpu(), guesses=c_logits.cpu())
         print(f"Threshold: {thresh}, F1: {f1}")
-        thresholds[c.item()] = thresh
+        thresholds[c.item()] = thresh.item()
     
     pprint(thresholds)
     print("DONE")
