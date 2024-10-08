@@ -5,11 +5,13 @@ from signaturesnet.utilities.data_generator import DataGenerator
 
 class Generator(nn.Module):
     
-    def __init__(self,
-                 input_size=72,
-                 num_hidden_layers=2,
-                 latent_dim=100,
-                 device="cuda") -> None:
+    def __init__(
+            self,
+            input_size=72,
+            num_hidden_layers=2,
+            latent_dim=100,
+            device="cuda"
+            ) -> None:
         self.init_args = locals()
         self.init_args.pop("self")
         self.init_args.pop("__class__")
@@ -57,9 +59,6 @@ class Generator(nn.Module):
             x = self.activation(layer(x))
         z_mu = self.mean_layer(x)
         z_var = torch.exp(self.var_layer(x))
-        # z_var = torch.ones_like(z_mu)
-        # z_var = torch.ones_like(z_mu)*0.7
-        # z_var = torch.ones_like(z_mu)*0.0001
         return z_mu, z_var
 
     def decode(self, x):
