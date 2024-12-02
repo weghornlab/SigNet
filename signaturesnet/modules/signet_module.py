@@ -12,12 +12,12 @@ from signaturesnet.utilities.io import read_model, read_signatures
 from signaturesnet.models import Baseline
 from signaturesnet.modules import CombinedFinetuner, ClassifiedFinetunerErrorfinder
 from signaturesnet.utilities.plotting import plot_weights
-from signaturesnet.modules.euc_classifier import get_measure, euc_classifier
+from signaturesnet.modules.euc_classifier import euc_classifier
 
 class SigNet:
 
     def __init__(self,
-                 classifier=os.path.join(TRAINED_MODELS, "detector"),
+                 # classifier=os.path.join(TRAINED_MODELS, "detector"),
                  finetuner_realistic_low=os.path.join(TRAINED_MODELS, "finetuner_low"),
                  finetuner_realistic_large=os.path.join(TRAINED_MODELS, "finetuner_large"),
                  errorfinder=os.path.join(TRAINED_MODELS, "errorfinder"),
