@@ -163,3 +163,8 @@ tmp/
 # executables
 !executables/refitter.py
 !executables/refitter.spec
+
+# 
+test_input.csv
+Output/*
+signaturesnet/data/train_all_input.csv
