@@ -1,20 +1,23 @@
 import numpy as np
 import pandas as pd
 import torch
+import gzip
 
-def euc_classifier(mutation_dist, num_mut, train_file_path="signaturesnet/data/train_all_input.csv", measures_path = 'signaturesnet/data/measure_2.0_1.4e-02_interpolated.txt'):
+def euc_classifier(mutation_dist, num_mut, train_file_path="signaturesnet/data/realistic_profiles.csv.gz", measures_path = 'signaturesnet/data/measure_2.0_1.4e-02_interpolated.txt'):
 	""" 
 	Classify a set of mutations as realistic or not based on the Euclidean distance to the training data.
 	Args:
 		mutation_dist(torch.Tensor): Tensor of shape (n, 96) with the mutational distribution for each sample
 		num_mut(torch.Tensor): Tensor of shape (n,) with the number of mutations for each sample
 		train_file_path(str): Path to the training data file
+		measures_path(str): Path to the file with the measures for each number of mutations
 	Returns:
 		classification(torch.Tensor): Tensor of shape (n,) with the classification of each sample
 	"""
 	# Load training data
-	train_data = np.loadtxt(train_file_path, delimiter=",")
-	train_tensor = torch.tensor(train_data, dtype=torch.float32)
+	with gzip.open(train_file_path, 'rt') as f:
+		train_data = np.loadtxt(f, delimiter=",")
+	train_tensor = torch.tensor(train_data, dtype=torch.float32) # Convert it into a tensor
 
 	# Load the measures
 	measures_file = pd.read_csv(measures_path, sep='\t', header=None)
