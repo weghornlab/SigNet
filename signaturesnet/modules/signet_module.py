@@ -147,7 +147,8 @@ class SigNetResult:
         return weights, lower, upper, classification, normalized_input
 
     def save(self, 
-             path='Output'):
+             path='Output', 
+             name='signet'):
         """ 
         Save outputs into a file.
         Args:
@@ -160,25 +161,25 @@ class SigNetResult:
         try:
             weights.columns = self.sig_names + ['Unknown']
             weights.index = self.mutation_dataset.index
-            weights.to_csv(path + "/weight_guesses.csv", header=True, index=True)
+            weights.to_csv(path + "/weight_guesses-"+name+".csv", header=True, index=True)
         except:
             weights.columns = self.sig_names
             weights.index = self.mutation_dataset.index
-            weights.to_csv(path + "/weight_guesses.csv", header=True, index=True)
+            weights.to_csv(path + "/weight_guesses-"+name+".csv", header=True, index=True)
 
         lower.columns = self.sig_names
         lower.index = self.mutation_dataset.index
-        lower.to_csv(path + "/lower_bound_guesses.csv", header=True, index=True)
+        lower.to_csv(path + "/lower_bound_guesses-"+name+".csv", header=True, index=True)
     
         upper.columns = self.sig_names
         upper.index = self.mutation_dataset.index
-        upper.to_csv(path + "/upper_bound_guesses.csv", header=True, index=True)
+        upper.to_csv(path + "/upper_bound_guesses-"+name+".csv", header=True, index=True)
     
         classification.columns = ['Classification']
         classification.index = self.mutation_dataset.index
-        classification.to_csv(path + "/classification_guesses.csv", header=True, index=True)
+        classification.to_csv(path + "/classification_guesses-"+name+".csv", header=True, index=True)
 
-        self.mutation_dataset.to_csv(path + "/mutation_counts_input.csv", header=True, index=True)
+        self.mutation_dataset.to_csv(path + "/mutation_counts_input-"+name+".csv", header=True, index=True)
         logging.info("Writting results: %s... DONE"%path)
 
     def plot_results(self, 

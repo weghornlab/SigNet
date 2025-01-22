@@ -168,3 +168,5 @@ tmp/
 test_input.csv
 Output/*
 signaturesnet/data/train_all_input.csv
+.Rhistory
+run_all_PCAWG_SV.sh

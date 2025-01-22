@@ -15,7 +15,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s',
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument(
-        '--experiment_id', action='store', nargs=1, type=str, required=False, default=["test_0"],
+        '--experiment_id', action='store', nargs=1, type=str, required=False, default=["signet"],
         help=f"Name of this inference's results"
     )
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     w, u, l, c, _ = results.get_output()
 
     # Store results
-    results.save(path=args.output[0])
+    results.save(path=args.output[0], name=args.experiment_id[0])
 
     # Plot figures
     results.plot_results(compute=args.plot_figs[0], save=True, path=args.output[0]+'/plots')
