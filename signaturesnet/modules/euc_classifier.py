@@ -3,7 +3,7 @@ import pandas as pd
 import torch
 import gzip
 
-def euc_classifier(mutation_dist, num_mut, train_file_path="signaturesnet/data/realistic_profiles.csv.gz", measures_path = 'signaturesnet/data/measure_2.0_1.4e-02_interpolated.txt'):
+def euc_classifier(mutation_dist, num_mut, train_file_path="data/realistic_profiles.csv.gz", measures_path = 'data/measure_6_4.0e-02_7_interpolated.txt'):
 	""" 
 	Classify a set of mutations as realistic or not based on the Euclidean distance to the training data.
 	Args:
@@ -34,7 +34,7 @@ def euc_classifier(mutation_dist, num_mut, train_file_path="signaturesnet/data/r
 			classification.append(0)
 		else:
 			# Compute Euclidean distances in a vectorized way
-			distances = torch.sqrt(torch.sum((train_tensor - mutation_instance) ** 2, dim=1))
+			distances = torch.sqrt(torch.sum((train_tensor - mutation_instance)**2, dim=1))
 			# Find the minimum distance
 			min_distance = torch.min(distances)
 
