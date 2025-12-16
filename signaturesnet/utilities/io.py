@@ -300,7 +300,7 @@ def read_model(directory, device="cpu"):
     Args:
         directory (String): Folder containing state_dict and init_args.json of the model
     """
-    from signaturesnet.models import Generator, Classifier, FineTunerLowNumMut, FineTunerLargeNumMut, ErrorFinder, NumMutNet
+    from signaturesnet.models import Generator, FineTunerLowNumMut, FineTunerLargeNumMut, ErrorFinder, NumMutNet
 
     # Load init_args
     init_args_file = os.path.join(directory, 'init_args.json')

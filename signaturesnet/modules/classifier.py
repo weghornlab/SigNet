@@ -2,26 +2,28 @@ import numpy as np
 import pandas as pd
 import torch
 import gzip
+import os
+from signaturesnet import DATA
 
-def euc_classifier(mutation_dist, num_mut, train_file_path="data/realistic_profiles.csv.gz", measures_path = 'data/measure_6_4.0e-02_7_interpolated.txt'):
+def euclidean_classifier(mutation_dist, num_mut):
 	""" 
 	Classify a set of mutations as realistic or not based on the Euclidean distance to the training data.
 	Args:
 		mutation_dist(torch.Tensor): Tensor of shape (n, 96) with the mutational distribution for each sample
 		num_mut(torch.Tensor): Tensor of shape (n,) with the number of mutations for each sample
-		train_file_path(str): Path to the training data file
-		measures_path(str): Path to the file with the measures for each number of mutations
 	Returns:
 		classification(torch.Tensor): Tensor of shape (n,) with the classification of each sample
 	"""
-	# Load training data
-	with gzip.open(train_file_path, 'rt') as f:
-		train_data = np.loadtxt(f, delimiter=",")
-	train_tensor = torch.tensor(train_data, dtype=torch.float32) # Convert it into a tensor
+	realistic_path = os.path.join(DATA,"realistic_profiles.csv.gz")
+	thresholds_path = os.path.join(DATA,'measure_6_4.0e-02_7_interpolated.txt')
+	# Load realistic profiles
+	with gzip.open(realistic_path, 'rt') as f:
+		realistic_data = np.loadtxt(f, delimiter=",")
+	realistic_tensor = torch.tensor(realistic_data, dtype=torch.float32) # Convert it into a tensor
 
-	# Load the measures
-	measures_file = pd.read_csv(measures_path, sep='\t', header=None)
-	measures_dict = pd.Series(measures_file[1].values, index=measures_file[0]).to_dict() # Convert it into a dictionary
+	# Load the thresholds
+	thresholds_file = pd.read_csv(thresholds_path, sep='\t', header=None)
+	thresholds_dict = pd.Series(thresholds_file[1].values, index=thresholds_file[0]).to_dict() # Convert it into a dictionary
 
 	classification = []
 	for i in range(mutation_dist.shape[0]):
@@ -34,17 +36,17 @@ def euc_classifier(mutation_dist, num_mut, train_file_path="data/realistic_profi
 			classification.append(0)
 		else:
 			# Compute Euclidean distances in a vectorized way
-			distances = torch.sqrt(torch.sum((train_tensor - mutation_instance)**2, dim=1))
+			distances = torch.sqrt(torch.sum((realistic_tensor - mutation_instance)**2, dim=1))
 			# Find the minimum distance
 			min_distance = torch.min(distances)
 
 			if num_mut_instance > 200000:
-				measure = measures_dict[200000]
+				threshold = thresholds_dict[200000]
 			else:
-				measure = measures_dict[num_mut_instance]
+				threshold = thresholds_dict[num_mut_instance]
 			
-			# Compare the minimum distance with the measure: classify as realistic if the distance is less than the measure
-			classification.append(1 if min_distance <= measure else 0)
+			# Compare the minimum distance with the threshold: classify as realistic if the distance is less than the threshold
+			classification.append(1 if min_distance <= threshold else 0)
 
 	# Return the classification as a tensor
 	return torch.tensor(classification, dtype=torch.float32)
