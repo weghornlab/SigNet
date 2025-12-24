@@ -1,0 +1,1 @@
+{"num_classes": 72, "num_hidden_layers": 1, "num_units": 848, "cutoff": 0.01, "sigmoid_params": [[500, 150], [5000, 1000], [10000, 5000]], "model_type": "FineTunerLowNumMut"}
