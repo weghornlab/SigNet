@@ -1,1 +1,1 @@
-{"sigmoid_params": [[500, 150], [5000, 1000], [10000, 5000]], "cutoff": 0.001, "num_units": 800, "num_hidden_layers": 1, "num_classes": 72, "model_type": "FineTunerLowNumMut"}
+{"num_classes": 72, "num_hidden_layers": 2, "num_units": 1000, "cutoff": 0.01, "sigmoid_params": [[500, 150], [5000, 1000], [10000, 5000]], "model_type": "FineTunerLowNumMut"}
